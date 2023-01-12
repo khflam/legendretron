@@ -12,12 +12,29 @@ pip install -r requirements.txt
 ```
 
 ## Directory Setup
-Setup the data subdirectory at the root of this reposity with the below folder structure
-├── data
-│   ├── segment
-│   │      └── segment.scale
+Setup the data folder at the root of this repository with the below structure
+```
+/data/aloi/
+/data/dna/
+/data/fmnist/
+/data/glass/
+/data/iris/
+/data/kmnist/
+/data/letter/
+/data/mnist/
+/data/news20/
+/data/satimage/
+/data/sector/
+/data/segment/
+/data/Sensorless/
+/data/svmguide2/
+/data/usps/
+/data/vehicle/
+/data/vowel/
+/data/wine/
+```
 
-Datasets are available at:
+Download the associated datasets from the below sources and move them into the matching subfolder in the above:
 * https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/
 * http://yann.lecun.com/exdb/mnist/
 * http://codh.rois.ac.jp/kmnist/index.html.en
