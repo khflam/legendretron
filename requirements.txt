@@ -1,0 +1,12 @@
+# uncomment line below when installing CUDA version of PyTorch
+#--extra-index-url https://download.pytorch.org/whl/cu116
+torch
+torchvision
+autograd
+numpy
+matplotlib
+scipy
+decorator
+psutil
+sklearn
+tqdm
