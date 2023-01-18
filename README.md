@@ -40,36 +40,52 @@ Download the associated datasets from the below sources and move them into the m
 * http://codh.rois.ac.jp/kmnist/index.html.en
 * https://github.com/zalandoresearch/fashion-mnist
 
+## Experiment run setup
+cd to the root of this repository before running any of the below experiments.
+
+## LIBSVM demo
+Refer to legendretron_demo.ipynb to reproduce accuracy statistics.
+
 ## LIBSVM examples
 Run implementation of LegendreTron:
 ```
-python lt_libsvm.py --dataset "segment" --seed 0
+python -m experiments.lt_libsvm --dataset "segment" --seed 123
 ```
 
 Run implementation of LegendreTron with label noise:
 ```
-python lt_libsvm.py --dataset "segment" --seed 0 --flip_labels --eta 0.2
+python -m experiments.lt_libsvm --dataset "segment" --seed 123 --flip_labels --eta 0.2
 ```
 
 Run implementation of Multinomial Logistic Regression:
 ```
-python mlr_libsvm.py --dataset "segment" --seed 0
+python -m experiments.mlr_libsvm --dataset "segment" --seed 123
 ```
 
 Run implementation of Multinomial Logistic Regression with label noise:
 ```
-python mlr_libsvm.py --dataset "segment" --seed 0 --flip_labels --eta 0.2
+python -m experiments.mlr_libsvm --dataset "segment" --seed 123 --flip_labels --eta 0.2
 ```
 
 ## MNIST examples
-Run implementation of LegendreTron:
+Run implementation of LegendreTron on multiclass problem with 10 classes:
 ```
-python lt_mnist.py --dataset "kmnist" --seed 0
+python -m experiments.lt_mnist --dataset "fmnist" --seed 123
 ```
 
-Run implementation of Multinomial Logistic Regression:
+Run implementation of Multinomial Logistic Regression on multiclass problem with 10 classes:
 ```
-python mlr_mnist.py --dataset "kmnist" --seed 0
+python -m experiments.mlr_mnist --dataset "fmnist" --seed 123
+```
+
+Run implementation of LegendreTron to classify odd (1,3,5,7,9) vs even numbers (0,2,4,6,8):
+```
+python -m experiments.lt_mnist --dataset "fmnist" --seed 123 --binary --pos 1 3 5 7 9 --neg 0 2 4 6 8
+```
+
+Run implementation of Multinomial Logistic Regression to classify odd (1,3,5,7,9) vs even numbers (0,2,4,6,8):
+```
+python -m experiments.mlr_mnist --dataset "fmnist" --seed 123 --binary --pos 1 3 5 7 9 --neg 0 2 4 6 8
 ```
 
 ## Acknowledgements
