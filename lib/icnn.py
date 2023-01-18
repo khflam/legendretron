@@ -1,6 +1,10 @@
+"""
+Definitions of Input Convex Neural Networks and related helper functions
+Taken from:
+https://github.com/CW-Huang/CP-Flow/blob/main/lib/icnn.py
+"""
 import numpy as np
 import torch
-import torch.nn.init as init
 from torch import Tensor, nn
 
 _scaling_min = 0.001
@@ -76,7 +80,6 @@ class Softplus(nn.Module):
 
 
 class SymmSoftplus(torch.nn.Module):
-    # noinspection PyMethodMayBeStatic
     def forward(self, x):
         return symm_softplus(x)
 
@@ -92,88 +95,6 @@ class PosLinear(torch.nn.Linear):
         )
 
 
-class PosLinear2(torch.nn.Linear):
-    def forward(self, x: Tensor) -> Tensor:
-        return nn.functional.linear(
-            x, torch.nn.functional.softmax(self.weight, 1), self.bias
-        )
-
-
-class PosLinearDropConn(torch.nn.Module):
-    def __init__(self, dim_in, dim_out, bias=True, dropout_prob=0.25):
-        super(PosLinearDropConn, self).__init__()
-        self.fc = torch.nn.Linear(
-            in_features=dim_in, out_features=dim_out, bias=bias
-        )
-        self.dropout_weight = torch.nn.Dropout(p=dropout_prob)
-
-        self.bias = bias
-        if bias:
-            self.dropout_bias = torch.nn.Dropout(p=dropout_prob)
-
-    def forward(self, x: Tensor) -> Tensor:
-        gain = 1 / x.size(1)
-
-        if self.bias:
-            return (
-                nn.functional.linear(
-                    x,
-                    self.dropout_weight(
-                        torch.nn.functional.softplus(self.fc.weight)
-                    ),
-                    self.dropout_bias(self.fc.bias),
-                )
-                * gain
-            )
-        else:
-            return (
-                nn.functional.linear(
-                    x,
-                    self.dropout_weight(
-                        torch.nn.functional.softplus(self.fc.weight)
-                    ),
-                )
-                * gain
-            )
-
-
-class LinearDropConn(torch.nn.Module):
-    def __init__(self, dim_in, dim_out, bias=True, dropout_prob=0.25):
-        super(LinearDropConn, self).__init__()
-        self.fc = torch.nn.Linear(
-            in_features=dim_in, out_features=dim_out, bias=bias
-        )
-        self.dropout_weight = torch.nn.Dropout(p=dropout_prob)
-
-        self.bias = bias
-        if bias:
-            self.dropout_bias = torch.nn.Dropout(p=dropout_prob)
-
-    def forward(self, x: Tensor) -> Tensor:
-        if self.bias:
-            return nn.functional.linear(
-                x,
-                self.dropout_weight(self.fc.weight),
-                self.dropout_bias(self.fc.bias),
-            )
-        else:
-            return nn.functional.linear(x, self.dropout_weight(self.fc.weight))
-
-
-class PosConv2d(torch.nn.Conv2d):
-    def reset_parameters(self) -> None:
-        super().reset_parameters()
-        # noinspection PyProtectedMember,PyAttributeOutsideInit
-        self.fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)
-
-    def forward(self, x: Tensor) -> Tensor:
-        return (
-            self._conv_forward(x, torch.nn.functional.softplus(self.weight))
-            / self.fan_in
-        )
-
-
-# noinspection PyUnusedLocal
 class ActNorm(torch.nn.Module):
     """ActNorm layer with data-dependant init."""
 
@@ -318,25 +239,3 @@ class ICNN3(torch.nn.Module):
             )
             z = torch.cat([z, aug], 1)
         return self.actnorms[-1](self.Wzs[-1](z) + self.Wxs[-1](x))
-
-
-def plot_softplus():
-    import matplotlib.pyplot as plt
-
-    xx = torch.linspace(-4, 4)
-    plt.plot(xx.data.numpy(), softplus(xx).data.numpy(), label="Softplus")
-    plt.plot(
-        xx.data.numpy(),
-        laplace_softplus(xx).data.numpy(),
-        label="Laplace Softplus",
-    )
-    plt.plot(
-        xx.data.numpy(),
-        gaussian_softplus(xx).data.numpy(),
-        label="Gaussian Softplus",
-    )
-    plt.plot(xx.data.numpy(), torch.relu(xx).data.numpy(), label="ReLU")
-    plt.grid()
-    plt.legend(fontsize=15)
-    plt.tight_layout()
-    plt.savefig("softplus_functions.png")

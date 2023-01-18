@@ -1,3 +1,8 @@
+"""
+Definition of Log(Softmax^{+}) and other helper functions for ICNNs
+Modified from:
+https://github.com/CW-Huang/CP-Flow/blob/main/lib/functional.py
+"""
 import numpy as np
 import torch
 import torch.nn as nn
@@ -60,39 +65,6 @@ def log_sum_exp(a, axis=-1, sum_op=torch.sum):
 
     b = torch.log(oper(a, summation, axis, True)) + a_max
     return b
-
-
-def log_sum_exp_plus(a, axis=-1, sum_op=torch.sum):
-    def maximum(x):
-        return x.max(axis)[0]
-
-    a_max = oper(a, maximum, axis, True)
-
-    def summation(x):
-        return sum_op(torch.exp(x - a_max), axis)
-
-    b = torch.log(oper(a, summation, axis, True) + torch.exp(-a_max)) + a_max
-    return b
-
-
-def softmax_plus(a, axis=-1, sum_op=torch.sum):
-    def maximum(x):
-        return x.max(axis)[0]
-
-    a_max = oper(a, maximum, axis, True)
-
-    def summation(x):
-        return sum_op(torch.exp(x - a_max), axis)
-
-    return torch.exp(a - a_max) / (
-        oper(a, summation, axis, True) + torch.exp(-a_max)
-    )
-
-
-def proj_to_simplex(p, axis=-1, sum_op=torch.sum):
-    p_last = 1 - sum_op(p, axis)
-    p_last = torch.unsqueeze(p_last, axis)
-    return torch.cat((p, p_last), axis)
 
 
 def log_softmax_plus(a, axis=-1, sum_op=torch.sum):

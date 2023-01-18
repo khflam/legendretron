@@ -1,3 +1,8 @@
+"""
+Definition of Canonical Link based on Convex Potential Flows
+Modified from:
+https://github.com/CW-Huang/CP-Flow/blob/main/lib/flows/cpflows.py
+"""
 import torch
 import torch.nn.functional as F
 import torch.optim
@@ -9,8 +14,8 @@ from lib.icnn import ICNN3
 class DeepConvexFlow(torch.nn.Module):
     """
     Deep convex potential flow parameterized by an input-convex neural network.
-    This is the main framework used in Huang et al. We use this model as v^{-1}
-    within the (u,v)-geometric structure.
+    This is the main framework used in Huang et al. We use the forward pass of
+    this model as v^{-1} within the (u,v)-geometric structure.
     """
 
     def __init__(

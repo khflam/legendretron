@@ -1,22 +1,39 @@
+"""
+PyTorch dataset definitions and data loading functions
+Modified from:
+https://gitlab.com/cwalder/linkgistic/-/blob/master/linkgistic/data.py
+"""
 import os
+import random
 from collections import Counter
 
-import datasets
 import numpy as np
-import scipy.io as sio
 from sklearn.datasets import load_svmlight_file
+from torch.utils.data import Dataset
 
-from lib import helpers
+import lib.loader
 
 _mnists = ["mnist", "fmnist", "kmnist"]
 _path = os.path.expanduser("~/data/")
+
+
+# iterate over a sequence in random order
+def randomly(seq, seed=None):
+    if seed is not None:
+        state = random.getstate()
+        random.seed(seed)
+    shuffled = list(seq)
+    random.shuffle(shuffled)
+    if seed is not None:
+        random.setstate(state)
+    return iter(shuffled)
 
 
 def raw_digit_data(ypos, yneg, datatype, train, seed):
 
     assert datatype in _mnists
 
-    mndata = datasets.MNIST("%s/%s" % (_path, datatype))
+    mndata = lib.loader.MNIST("%s/%s" % (_path, datatype))
 
     if train:
         Xall, Yall = map(np.array, mndata.load_training())
@@ -39,9 +56,7 @@ def raw_digit_data(ypos, yneg, datatype, train, seed):
     Ymulti = Yall[iany]
     Xall = Xall[iany, :]
 
-    ishuffle = np.array(tuple(helpers.randomly(range(len(Y)), seed))).astype(
-        int
-    )
+    ishuffle = np.array(tuple(randomly(range(len(Y)), seed))).astype(int)
     X = Xall[ishuffle, :]
     Y = Y[ishuffle]
     Ymulti = Ymulti[ishuffle]
@@ -143,3 +158,31 @@ def noisify(y, K=9, eta=0.1, random_state=0):
         new_y[idx] = label_flipper.multinomial(n=1, pvals=p_vals).argmax()
 
     return new_y
+
+
+class MNISTDataset(Dataset):
+    def __init__(self, images, labels):
+        self.labels = labels
+        self.images = images
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        label = self.labels[idx, :]
+        image = self.images[idx, :]
+        return image, label
+
+
+class LibSVMDataset(Dataset):
+    def __init__(self, features, labels):
+        self.labels = labels
+        self.features = features
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        label = self.labels[idx, :]
+        feature = self.features[idx, :]
+        return feature, label
