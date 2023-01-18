@@ -5,7 +5,7 @@ This repository contains code to learn proper multiclass losses by learning cano
 ## Environment Setup
 Create a python3.10.6 virtualenv and start a terminal. Uncomment lines in the requirements.txt file if installing PyTorch with CUDA support.
 
-Run 
+To install with pip:
 
 ```
 pip install -r requirements.txt
@@ -42,6 +42,9 @@ Download the associated datasets from the below sources and move them into the m
 
 ## Experiment run setup
 cd to the root of this repository before running any of the below experiments.
+```
+cd ~/<path_to_directory_containing_this_repo>/legendretron
+```
 
 ## LIBSVM demo
 Refer to legendretron_demo.ipynb to reproduce accuracy statistics.
@@ -66,6 +69,8 @@ Run implementation of Multinomial Logistic Regression with label noise:
 ```
 python -m experiments.mlr_libsvm --dataset "segment" --seed 123 --flip_labels --eta 0.2
 ```
+
+Note that the longest run time for a single experiment is running LegendreTron on the aloi dataset which took around 4 hours.
 
 ## MNIST examples
 Run implementation of LegendreTron on multiclass problem with 10 classes:
