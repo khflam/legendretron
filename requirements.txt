@@ -8,5 +8,5 @@ matplotlib
 scipy
 decorator
 psutil
-sklearn
+scikit-learn
 tqdm
